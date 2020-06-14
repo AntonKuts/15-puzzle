@@ -1,12 +1,18 @@
 .App{
-  width: 400px;
+  width: 360px;
   margin: 0 auto;
+  font-size: 12px;
+}
+
+p {
+  text-align: center;
+  text-transform: uppercase;
 }
 
 .PlayingField {
-  margin-top: 30px;
-  width: 400px;
-  height: 400px;
+  margin-top: 20px;
+  width: 360px;
+  height: 360px;
   border: 2px solid #8a7271;
   background-color: #efe5d4;
   display: flex;
@@ -22,11 +28,11 @@
 }
 
 .Tile{
-  width: 85px;
-  height: 85px;
+  width: 80px;
+  height: 80px;
   border: 2px solid #8a7271;
   background-color: #f07d10;
-  font-size: 60px;
+  font-size: 50px;
   color: #efe5d4;
   display: flex;
   flex-direction: row;
@@ -63,10 +69,11 @@
 }
 
 .ForWin{
-  font-size: 30px;
+  font-size: 20px;
   color: red;
   text-decoration: underline;
-  margin-left: 50px;
+  margin-left: 135px;
+  text-align: center;
 }
 
 .BoxForBtn{
@@ -76,18 +83,45 @@
   align-items: flex-start;
 }
 
-.btn{
+.BoxForInfo {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.BoxForInfo .btn {
+  padding: 0;
+  border: none;
+  background-color: white;
+  color: red;
+  box-shadow: none;
+  margin: 2px 0;
+}
+
+.BoxForInfo .btn:hover, .BoxForInfo .btn:focus{
+  background-color: red;
+  color: white;
+}
+
+
+.BoxForInfo .btn[disabled] {
+  background-color: white !important;
+}
+
+.btn {
   background-color: #f07d10;
   color: #efe5d4;
-  padding: 0 1.6rem;
-  /* border: 2px solid #8a7271; */
 }
 
 .btn:hover, .btn:focus{
   background-color: #7c8782;
 }
 
-p{
-  text-align: center;
-  text-transform: uppercase;
+.Red {
+  color: red;
+}
+
+.Green{
+  color: green;
 }
