@@ -1,4 +1,4 @@
-.App{
+.App {
   width: 360px;
   margin: 0 auto;
   font-size: 12px;
@@ -23,11 +23,12 @@ p {
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12), 0 3px 1px -2px rgba(0,0,0,0.2);
 }
 
-.PlayingFieldWin{
+.PlayingFieldWin {
   background-color: #f07d10;
 }
 
-.Tile{
+.Tile {
+  position: relative;
   width: 80px;
   height: 80px;
   border: 2px solid #8a7271;
@@ -43,32 +44,58 @@ p {
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12), 0 3px 1px -2px rgba(0,0,0,0.2);
 }
 
-.Tile:hover{
+.Tile:hover {
   background-color: #7c8782;
   color: #f07d10;
 }
 
-.CorrectPosition{
+.CorrectPosition {
   background-color: #5b8300;
 }
 
-.CorrectPosition:hover{
+.CorrectPosition:hover {
   color: #5b8300;
 }
 
-.Tile:empty{
+.Empty {
   border: 2px solid #efe5d4;
   background-color:  #efe5d4;
+  color: #efe5d4;
   cursor: auto;
   box-shadow: none;
 }
 
-.PlayingFieldWin .Tile:empty{
-  background-color: #f07d10;
-  border: 2px solid #f07d10;
+.Empty {
+  border: 2px solid #efe5d4;
+  background-color:  #efe5d4;
+  color: #efe5d4;
+  cursor: auto;
+  box-shadow: none;
 }
 
-.ForWin{
+.Empty span {
+  color: #8a7271;
+}
+
+.PlayingFieldWin .Empty {
+  background-color: #f07d10;
+  border: 2px solid #f07d10;
+  color: #f07d10;
+}
+
+.Empty:hover {
+  border: 2px solid #efe5d4;
+  background-color:  #efe5d4;
+  color: #efe5d4;
+}
+
+.PlayingFieldWin .Empty:hover {
+  background-color: #f07d10;
+  border: 2px solid #f07d10;
+  color: #f07d10;
+}
+
+.ForWin {
   font-size: 20px;
   color: red;
   text-decoration: underline;
@@ -76,7 +103,7 @@ p {
   text-align: center;
 }
 
-.BoxForBtn{
+.BoxForBtn {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -124,4 +151,11 @@ p {
 
 .Green{
   color: green;
+}
+
+.Tile span{
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 8px;
 }

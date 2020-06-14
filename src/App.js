@@ -2,94 +2,149 @@ import React, { useState }  from 'react';
 import './App.css';
 import { Button } from 'react-materialize'
 
-function App() {
+const infoFromLocalStorage = JSON.parse(localStorage.getItem('game'));
 
-  const squareNumbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,""];
-  const [tiles, setTiles] = useState(startingPosition());
-  const [numberMoves, setNumberMoves] = useState(0);
+const App = () => {
+
+  const squareNumbers = [...[...[...Array(16).keys()].slice(1)], 0]; // [1-16, 0];
+  const randomized = () => squareNumbers.sort( () => 0.5-Math.random());
+  const newRandomized = () => {
+      // const
+      // for (let i = 0; i < 100; i++) {
+      //     // const rendomMove = randomized()[0];
+      //     // console.log(i, ') rendomMove - ', rendomMove);
+      //     // checkAndMove(rendomMove);
+      //     // // setTimeout(() => checkAndMove(rendomMove), 2000);
+      // }
+  };
+
+  const startingPosition = name => {
+      if (infoFromLocalStorage && infoFromLocalStorage[name]) return infoFromLocalStorage[name];
+      if (name === 'tiles') return randomized();
+      if (name === 'level') return 'hard';
+      return 0;
+  };
+
+  const [tiles, setTiles] = useState(startingPosition('tiles'));
+  const [numberMoves, setNumberMoves] = useState(startingPosition('numberMoves'));
+  const [level, setLevel] = useState(startingPosition('level'));
+  const [bestResult, setBestResult] = useState(startingPosition('bestResult'));
   const [win, setWin] = useState(false);
 
-  function startingPosition (){
-  let returnLocalStorage = JSON.parse(localStorage.getItem("tiles"));
-     if (returnLocalStorage){
-       return returnLocalStorage;
-     } else {
-       return Randomized();
-     }
-   }
+  const saveInLocalStorage = (
+      newTiles = tiles,
+      newNumberMoves = numberMoves,
+      newLevel = level,
+      newBestResult = bestResult) => {
+      const infoForLocalStorage = {
+          tiles : newTiles,
+          numberMoves : newNumberMoves,
+          level : newLevel,
+          bestResult : newBestResult,
+      };
+      const stringifyInfo = JSON.stringify(infoForLocalStorage);
+      localStorage.setItem('game', stringifyInfo);
+  };
 
-  function saveLocalStorage (info){
-    let tilesForLocalStorage = JSON.stringify(info);
-    localStorage.setItem("tiles", tilesForLocalStorage);
-  }
+  const savePosition = (tiles, numberMoves, newLevel = level) => {
+    setTiles(tiles);
+    setNumberMoves(numberMoves);
+    saveInLocalStorage(tiles, numberMoves, newLevel, null);
+  };
 
-  function Randomized() {
-    let clonesQuareNumbers = squareNumbers.map( number => number );
-    clonesQuareNumbers.sort(function(){ return 0.5-Math.random() });
-    saveLocalStorage (clonesQuareNumbers);
-    return clonesQuareNumbers;
-  }
+  const saveBestResult = (numberMoves) => {
+    setBestResult(numberMoves);
+    saveInLocalStorage(null,null,null, numberMoves);
+  };
 
-  function NewGame (level) {
-    if (level === "hard"){
-      setTiles(Randomized());
-    } else {
-      setTiles(squareNumbers);
-      saveLocalStorage (squareNumbers);
-    }
-    setNumberMoves(0);
+  const newGame = newLevel => {
+    setLevel(newLevel);
     setWin(false);
-  }
+    savePosition(newLevel === 'hard' ? randomized() : squareNumbers,0, newLevel);
+  };
 
-  const Move = (index) => {
-    const Tiles = [...tiles];
-    let possibleMoves = [index - 4, index + 4];
-    if(index !== 4 && index !== 8 && index !== 12){
-      possibleMoves.push( index - 1 );
-    }
-    if(index !== 3 && index !== 7 && index !== 11){
-      possibleMoves.push( index + 1 );
-    }
-    for (let i = 0; i < 4; i++) {
-      if (tiles[possibleMoves[i]] === ""){
-        Tiles[possibleMoves[i]] = Tiles[index];
-        Tiles[index] = "";
-        setWin(winСheck(Tiles));
-        setTiles(Tiles);
-        setNumberMoves(numberMoves + 1);
-        saveLocalStorage (Tiles);
-        return;
-      }
-    }
-  }
-
-  const winСheck = (tiles) => {
-    let check = true;
+  const winCheck = tiles => {
     for (let i = 0; i < tiles.length-1; i++) {
-      if(tiles[i] !== i+1){
-        return false;
+      if (tiles[i] !== i + 1) {
+          return false;
       }
     }
-    return check;
-  }
+    if (level === 'hard' && (bestResult === 0 || (numberMoves > 0 && bestResult > numberMoves))) saveBestResult(numberMoves + 1);
+    return true;
+  };
+
+  const checkPossibleMove = index => {
+      if (tiles[index - 4] === 0) return  index - 4;
+      if (tiles[index + 4] === 0) return index + 4;
+      if (tiles[index - 1] === 0 && index !== 4 && index !== 8 && index !== 12) return index - 1;
+      if (tiles[index + 1] === 0 && index !== 3 && index !== 7 && index !== 11) return index + 1;
+      return -1
+  };
+
+  const checkAndMove = index => {
+    const indexForMove = checkPossibleMove(index);
+    if (indexForMove >= 0) {
+      const newTiles = [...tiles];
+      [newTiles[indexForMove], newTiles[index]] = [newTiles[index], newTiles[indexForMove]];
+      setWin(winCheck(newTiles));
+      savePosition(newTiles, numberMoves + 1);
+    }
+  };
+
+  const getDesign = (tile, index) => {
+      if (tile === 0) return 'Empty';
+      if (tile === index + 1) return 'CorrectPosition';
+      return null;
+  };
+
+  const startNewGame = () => window.confirm(`YOU WIN!!
+      ${numberMoves === bestResult ? 'New Record!! ' : ''} Moves: ${numberMoves}. Start new game (hard)?`)
+          ? newGame('hard')
+          : null;
 
   return (
-    <div className="App">
-      <div className={win ? "PlayingField PlayingFieldWin" : "PlayingField"}>
+    <div className='App'>
+      <div className={`PlayingField ${win ? 'PlayingFieldWin' : null}`}>
         {tiles.map((tile, index) => (
-          <div className={tile === (index+1) ? "Tile CorrectPosition" : "Tile"} key={index} onClick={() => Move(index)}>{tile}</div>
+          <div className={`Tile ${getDesign(tile, index)}`}
+               key={index}
+               onClick={() => win ? startNewGame() : checkAndMove(index)}>
+            {tile}
+            <span> {index + 1} </span>
+          </div>
         ))}
       </div>
-      <p>
-        Number of moves: {numberMoves}
-        {win ? <span className='ForWin'>YOU WIN!</span> : ""}
-      </p>
-      <div className="BoxForBtn">
-        <Button onClick={() => NewGame("hard")}> New Game (hard) </Button>
-        <Button onClick={() => NewGame("easy")}> New Game (easy) </Button>
+      {win ? <span className='ForWin'>YOU WIN!</span> : ''}
+      <div className='BoxForInfo'>
+        <p>
+          You play:
+          <span className={level === 'hard' ? 'Red' : 'Green'}>
+              {level === 'hard' ? ' Hard ' : ' Easy '}
+          </span>
+          level
+        </p>
+        <p>
+          Number of moves:<span className='Red'> {numberMoves} </span>
+        </p>
       </div>
+      <div className='BoxForInfo'>
+        <p> Your best result (only Hard level):
+            <span className='Red'> {bestResult} </span>
+        </p>
+        <Button size="small" color="secondary" variant="contained" disabled={bestResult === 0}
+                onClick={() => window.confirm(`Reset your best result - ${bestResult} ?`)
+                    ? saveBestResult(0) : null}
+        >
+          reset
+        </Button>
+      </div>
+      <div className='BoxForBtn'>
+        <Button onClick={() => newGame('hard')}> New Game (hard) </Button>
+        <Button onClick={() => newGame('easy')}> New Game (easy) </Button>
+      </div>
+      <Button onClick={() => newRandomized()}> newRandomized </Button>
     </div>
   );
-}
+};
 
 export default App;
