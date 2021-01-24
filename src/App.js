@@ -144,7 +144,7 @@ const App = () => {
         <Button onClick={() => newGame('hard')}> New Game (hard) </Button>
         <Button onClick={() => newGame('easy')}> New Game (easy) </Button>
       </div>
-      <Button onClick={() => newRandomized()}> newRandomized </Button>
+      <Button onClick={() => newRandomized()}> New Randomized </Button>
     </div>
   );
 };
