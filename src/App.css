@@ -153,9 +153,16 @@ p {
   color: green;
 }
 
-.Tile span{
+.Tile .Index{
   position: absolute;
   top: 5px;
+  right: 5px;
+  font-size: 8px;
+}
+
+.Tile .Direction{
+  position: absolute;
+  bottom: 5px;
   right: 5px;
   font-size: 8px;
 }

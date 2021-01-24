@@ -69,7 +69,7 @@ const App = () => {
           return false;
       }
     }
-    if (level === 'hard' && (bestResult === 0 || (numberMoves > 0 && bestResult > numberMoves))) saveBestResult(numberMoves + 1);
+    if (level === 'hard' && (bestResult === 0 || bestResult > numberMoves)) saveBestResult(numberMoves + 1);
     return true;
   };
 
@@ -78,12 +78,11 @@ const App = () => {
       if (tiles[index + 4] === 0) return index + 4;
       if (tiles[index - 1] === 0 && index !== 4 && index !== 8 && index !== 12) return index - 1;
       if (tiles[index + 1] === 0 && index !== 3 && index !== 7 && index !== 11) return index + 1;
-      return -1
+      return false
   };
 
-  const checkAndMove = index => {
-    const indexForMove = checkPossibleMove(index);
-    if (indexForMove >= 0) {
+  const checkAndMove = (index, indexForMove) => {
+    if (indexForMove) {
       const newTiles = [...tiles];
       [newTiles[indexForMove], newTiles[index]] = [newTiles[index], newTiles[indexForMove]];
       setWin(winCheck(newTiles));
@@ -104,13 +103,14 @@ const App = () => {
 
   return (
     <div className='App'>
-      <div className={`PlayingField ${win ? 'PlayingFieldWin' : null}`}>
+      <div className={`PlayingField ${win ? 'PlayingFieldWin' : null}`}  onClick={() => win ? startNewGame() : null}>
         {tiles.map((tile, index) => (
           <div className={`Tile ${getDesign(tile, index)}`}
                key={index}
-               onClick={() => win ? startNewGame() : checkAndMove(index)}>
+               onClick={() => checkAndMove(index, checkPossibleMove(index))}>
             {tile}
-            <span> {index + 1} </span>
+            <span className='Index' > {index + 1} </span>
+            <span className='Direction'> &#8595; </span>
           </div>
         ))}
       </div>
