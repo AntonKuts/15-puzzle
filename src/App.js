@@ -9,6 +9,7 @@ const App = () => {
   const squareNumbers = [...[...[...Array(16).keys()].slice(1)], 0]; // [1-16, 0];
   const randomized = () => squareNumbers.sort( () => 0.5-Math.random());
   const newRandomized = () => {
+      // TODO new randomizer
       // const
       // for (let i = 0; i < 100; i++) {
       //     // const rendomMove = randomized()[0];
@@ -31,30 +32,19 @@ const App = () => {
   const [bestResult, setBestResult] = useState(startingPosition('bestResult'));
   const [win, setWin] = useState(false);
 
-  const saveInLocalStorage = (
-      newTiles = tiles,
-      newNumberMoves = numberMoves,
-      newLevel = level,
-      newBestResult = bestResult) => {
-      const infoForLocalStorage = {
-          tiles : newTiles,
-          numberMoves : newNumberMoves,
-          level : newLevel,
-          bestResult : newBestResult,
-      };
-      const stringifyInfo = JSON.stringify(infoForLocalStorage);
-      localStorage.setItem('game', stringifyInfo);
+  const saveInLocalStorage = (infoForLocalStorage) => {
+      localStorage.setItem('game', JSON.stringify(infoForLocalStorage));
   };
 
   const savePosition = (tiles, numberMoves, newLevel = level) => {
     setTiles(tiles);
     setNumberMoves(numberMoves);
-    saveInLocalStorage(tiles, numberMoves, newLevel, null);
+    saveInLocalStorage({tiles, numberMoves, level : newLevel});
   };
 
   const saveBestResult = (numberMoves) => {
     setBestResult(numberMoves);
-    saveInLocalStorage(null,null,null, numberMoves);
+    saveInLocalStorage({ bestResult : numberMoves });
   };
 
   const newGame = newLevel => {
@@ -69,11 +59,13 @@ const App = () => {
           return false;
       }
     }
-    if (level === 'hard' && (bestResult === 0 || bestResult > numberMoves)) saveBestResult(numberMoves + 1);
+    if (level === 'hard' && (bestResult === 0 || bestResult > numberMoves)) {
+        saveBestResult(numberMoves + 1);
+    }
     return true;
   };
 
-  const checkPossibleMove = index => {
+  const checkPossibleMove = (index) => {
       if (tiles[index - 4] === 0) return  index - 4;
       if (tiles[index + 4] === 0) return index + 4;
       if (tiles[index - 1] === 0 && index !== 4 && index !== 8 && index !== 12) return index - 1;
@@ -81,8 +73,9 @@ const App = () => {
       return false
   };
 
-  const checkAndMove = (index, indexForMove) => {
-    if (indexForMove) {
+  const checkAndMove = (index) => {
+    const indexForMove = checkPossibleMove(index);
+    if (indexForMove !== false) {
       const newTiles = [...tiles];
       [newTiles[indexForMove], newTiles[index]] = [newTiles[index], newTiles[indexForMove]];
       setWin(winCheck(newTiles));
@@ -96,6 +89,15 @@ const App = () => {
       return null;
   };
 
+  const getDirection = (index) => {
+      const numberofDerection = checkPossibleMove(index);
+      if (numberofDerection === index - 4) return 'Up';
+      if (numberofDerection === index + 4) return 'Down';
+      if (numberofDerection === index - 1) return 'Left';
+      if (numberofDerection === index + 1) return 'Right';
+      return '';
+  };
+
   const startNewGame = () => window.confirm(`YOU WIN!!
       ${numberMoves === bestResult ? 'New Record!! ' : ''} Moves: ${numberMoves}. Start new game (hard)?`)
           ? newGame('hard')
@@ -107,10 +109,10 @@ const App = () => {
         {tiles.map((tile, index) => (
           <div className={`Tile ${getDesign(tile, index)}`}
                key={index}
-               onClick={() => checkAndMove(index, checkPossibleMove(index))}>
+               onClick={() => checkAndMove(index, tile)}>
             {tile}
             <span className='Index' > {index + 1} </span>
-            <span className='Direction'> &#8595; </span>
+            <span className='Direction'> {getDirection(index)} </span>
           </div>
         ))}
       </div>
